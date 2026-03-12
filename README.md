@@ -15,7 +15,10 @@ The TooPro code style emphasizes **pragmatism**, **compactness**, and **horizont
 
 ## Style Guides
 
-### [General Code Style](code_style_general.md)
+> **Note**: Style guide files live in `plugins/code-style/skills/code-style/references/` —
+> this repo is also a Claude Code skill (see [Installing as a Claude Code Skill](#installing-as-a-claude-code-skill) below).
+
+### [General Code Style](plugins/code-style/skills/code-style/references/general.md)
 Cross-language patterns and principles applicable to all TooPro projects:
 - Naming conventions
 - Code organization
@@ -23,7 +26,7 @@ Cross-language patterns and principles applicable to all TooPro projects:
 - Documentation standards
 - Formatting flexibility
 
-### [TypeScript Code Style](code_style_ts.md)
+### [TypeScript Code Style](plugins/code-style/skills/code-style/references/typescript.md)
 TypeScript/NestJS specific style for the **TpsSrv2** microservices monorepo:
 - Compact spacing (no space after `if`, `for`, `while`)
 - Single-line conditionals without braces
@@ -33,7 +36,7 @@ TypeScript/NestJS specific style for the **TpsSrv2** microservices monorepo:
 
 **Technology Stack**: NestJS, TypeScript, Nx monorepo, RabbitMQ, Directus CMS
 
-### [PHP Code Style](code_style_php.md)
+### [PHP Code Style](plugins/code-style/skills/code-style/references/php.md)
 PHP/Drupal 7 specific style for the **TooPro Drupal** backend:
 - Compact control structures: `if($condition) { }`
 - No space after `=>` in arrays: `'key'=> 'value'`
@@ -43,7 +46,7 @@ PHP/Drupal 7 specific style for the **TooPro Drupal** backend:
 
 **Technology Stack**: Drupal 7, PHP 5.3+, MySQL, AMF
 
-### [ActionScript 3 Code Style](code_style_as3.md)
+### [ActionScript 3 Code Style](plugins/code-style/skills/code-style/references/as3.md)
 ActionScript3/Adobe Flex specific style for the **tps_retail** point-of-sale interface:
 - No space after control keywords: `if(condition) { }`
 - No space after colons: `var x:String`
@@ -130,6 +133,22 @@ These guides emphasize:
 - **Pragmatism** over dogmatic adherence to standards
 - **Consistency** within each project
 - **Flexibility** when circumstances require it
+
+## Installing as a Claude Code Skill
+
+This repo is a self-contained Claude Code plugin. On any computer where you've cloned it:
+
+```bash
+# Add this repo as a marketplace (once per project)
+claude plugin marketplace add /path/to/code_style --scope project
+
+# Install the skill
+claude plugin install code-style@toopro-code-style --scope project
+```
+
+The skill automatically guides Claude to follow these code style rules whenever it writes or reviews code.
+
+To use across multiple projects, run both commands in each project directory.
 
 ## License
 

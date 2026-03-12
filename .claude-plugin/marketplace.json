@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "toopro-code-style",
+  "description": "TooPro code style skills",
+  "owner": {
+    "name": "TooPro"
+  },
+  "plugins": [
+    {
+      "name": "code-style",
+      "description": "TooPro code style guide for TypeScript/NestJS, PHP/Drupal, and ActionScript3/Flex",
+      "version": "1.0.0",
+      "source": "./plugins/code-style",
+      "category": "development"
+    }
+  ]
+}
