@@ -12,6 +12,13 @@
       "version": "1.0.0",
       "source": "./plugins/code-style",
       "category": "development"
+    },
+    {
+      "name": "feature-workflow",
+      "description": "AI-driven feature development workflow: ADR decisions, implementation plans, and build tracking",
+      "version": "1.0.0",
+      "source": "./plugins/feature-workflow",
+      "category": "development"
     }
   ]
 }

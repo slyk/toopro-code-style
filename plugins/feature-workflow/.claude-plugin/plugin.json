@@ -1,0 +1,5 @@
+{
+  "name": "feature-workflow",
+  "version": "1.0.0",
+  "description": "AI-driven feature development workflow: ADR decisions, implementation plans, and build tracking"
+}
