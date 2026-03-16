@@ -141,6 +141,26 @@ if(!trans) {
 }
 ```
 
+### if/else with single-statement branches — never use braces
+When both `if` and `else` branches contain a single statement, write without braces. Each branch on its own line. Inline comments go at end of the line — **never** inside a block:
+
+```actionscript
+// ✅ Correct
+if(t.type==OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) _prepareSplitCheckout(t, ord);
+else sendNotification(MVCConst.CART_CONFIRM, t, 'show box'); // No split needed
+
+if(status==TS_FINISHED) sendNotification(MVCConst.TRANS_DONE, t);
+else sendNotification(MVCConst.TRANS_PENDING, t);
+
+// ❌ Wrong - expanding single-statement branches into blocks
+if(t.type == OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) {
+    _prepareSplitCheckout(t, ord);
+} else {
+    // No split needed
+    sendNotification(MVCConst.CART_CONFIRM, t, 'show box');
+}
+```
+
 ## Access Modifiers and Visibility
 
 ### Class Members

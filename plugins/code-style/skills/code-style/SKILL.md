@@ -54,6 +54,23 @@ if (!id) {             // ❌ WRONG
 }
 ```
 
+### if/else with single-statement branches — no braces, no block expansion
+When both `if` and `else` branches contain a single statement, **never** use braces. Put each branch on its own line without braces. Inline comments go at the end of the line:
+```typescript
+// ✅ CORRECT
+if(t.type==OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) _prepareSplitCheckout(t, ord);
+else sendNotification(MVCConst.CART_CONFIRM, t, 'show box'); // No split needed
+
+// ❌ WRONG — expanding single-statement branches into blocks
+if(t.type == OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) {
+    _prepareSplitCheckout(t, ord);
+} else {
+    // No split needed
+    sendNotification(MVCConst.CART_CONFIRM, t, 'show box');
+}
+```
+This rule applies to `for`, `while`, and `else if` branches too — if the body is one statement, omit the braces.
+
 ### Single quotes for strings
 ```typescript
 const msg = 'hello';   // ✅

@@ -108,6 +108,26 @@ class MyClass
 }
 ```
 
+### Ternary Over if/else for Assignments
+**Prefer ternary** when assigning a variable based on a condition. For related/derived variables, reference the already-assigned variable — do not repeat the condition:
+
+```php
+// ✅ Correct — ternary assignment + derived second variable
+$productRetailFields = array('accent', 'barcodes_str', 'warranty');
+$collection = in_array($fieldName, $productRetailFields) ? 'product_retail' : 'product';
+$server = $collection == 'product' ? 'core' : 'work';
+
+// ❌ Wrong — if/else block for simple assignments, condition repeated
+$productRetailFields = array('accent', 'barcodes_str', 'warranty');
+if(in_array($fieldName, $productRetailFields)) {
+    $collection = 'product_retail';
+    $server = 'work';
+} else {
+    $collection = 'product';
+    $server = 'core';
+}
+```
+
 ### Single-Line Conditionals
 **Omit braces** for single-line if/else/return statements:
 

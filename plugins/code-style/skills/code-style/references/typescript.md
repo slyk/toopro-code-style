@@ -29,20 +29,40 @@ class MyClass
 **Omit braces** for single-line if/else statements:
 ```typescript
 // ✅ Correct
-if (condition) doSomething();
-if (!value) throw new Error('missing value');
-if (x > 0) return x;
+if(condition) doSomething();
+if(!value) throw new Error('missing value');
+if(x>0) return x;
 
 // ✅ Multiple related single-line conditions
-if (!id) return null;
-if (!data) throw new Error('no data');
+if(!id) return null;
+if(!data) throw new Error('no data');
 const result = process(data);
 
 // ❌ Wrong - unnecessary braces for single statement
-if (condition) {
+if(condition) {
   doSomething();
 }
 ```
+
+### if/else with single-statement branches — never use braces
+When both branches contain a single statement, write without braces. Each branch on its own line. Inline comments go at end of the line — never inside a block:
+```typescript
+// ✅ Correct
+if(t.type==OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) _prepareSplitCheckout(t, ord);
+else sendNotification(MVCConst.CART_CONFIRM, t, 'show box'); // No split needed
+
+if(result.success) return {payment, status:'completed', transactionId:result.id};
+else return {payment, status:'failed', error:result.error};
+
+// ❌ Wrong - expanding single-statement if/else into blocks
+if(t.type == OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) {
+    _prepareSplitCheckout(t, ord);
+} else {
+    // No split needed - show confirm box normally
+    sendNotification(MVCConst.CART_CONFIRM, t, 'show box');
+}
+```
+Same rule applies to `else if`, `for`, and `while` — if the body is one statement, no braces.
 
 ### Multiple Statements on Same Line
 Use semicolons to separate related statements on the same line:
