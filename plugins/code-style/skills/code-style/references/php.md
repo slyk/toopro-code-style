@@ -1,6 +1,6 @@
 # PHP Code Style Guide (TooPro/Drupal)
 
-This document defines PHP-specific code style used in the TooPro Drupal 7 project. For cross-language patterns, see [code_style_general.md](code_style_general.md).
+This document defines PHP-specific code style used in the TooPro Drupal 7 project. For cross-language patterns, see [general.md](general.md).
 
 ## PHP Version and Framework
 
@@ -33,7 +33,7 @@ function my_module_function() {
 ## Spacing and Formatting
 
 ### Control Structures
-**No space** after control keywords, but **do use** spaces inside parentheses sparingly:
+**No space** after `if`/`for`/`while`. `foreach` is the exception — real code writes it **with** a space more often than without; both forms are accepted, never "fix" existing ones:
 
 ```php
 // ✅ Correct
@@ -41,9 +41,10 @@ if($condition) {
     doSomething();
 }
 
-foreach($items as $item) {
+foreach ($items as $item) {   // ✅ spaced foreach — dominant form
     process($item);
 }
+foreach($items as $item) { }  // ✅ also accepted
 
 while($running) {
     tick();
@@ -140,7 +141,7 @@ if($value <= 0) $value = 0; else $value = round($value * 100) / 100;
 // Multiple related guards
 if(!$id) return null;
 if(!is_numeric($id)) return services_error('Wrong user ID');
-const $result = process($id);
+$result = process($id);
 
 // ❌ Wrong - unnecessary braces
 if(!$id) {
@@ -167,21 +168,33 @@ $items = ['item1', 'item2', 'item3'];
 ```
 
 ### Associative Arrays
-No space after `=>` operator:
+**Spaces around `=>`** are the standard form (~98% of the codebase). In dense inline arrays the compact `'k'=>'v'` form also appears — both accepted:
 
 ```php
-// ✅ Correct
-$form['sellplace'] = array(
-    '#type'=> 'fieldset',
-    '#title'=> 'Sell Place'
+// ✅ Correct — standard spaced form
+$items['admin/config/system/tps/rro'] = array(
+    'title' => 'ПРРО',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tps_pay_method_config_form'),
+    'access arguments' => array('administer transactions'),
+    'type' => MENU_LOCAL_TASK
 );
 
-$items = array(
-    'title'=> 'TooPro Shop Config',
-    'page callback'=> 'drupal_get_form',
-    'page arguments'=> array('tps_core_config_form'),
-    'access arguments'=> array('administer')
-);
+// ✅ Also accepted — compact form inside dense one-line arrays
+'file' => array('type'=>'inc', 'module'=>'tps_pay_method', 'name'=>'tpspay.resource'),
+```
+
+### Tab-Aligned `=>` Columns
+In large config/resource arrays, `=>` are often aligned into a column with tabs — this is deliberate, preserve it:
+
+```php
+'works'=> array(
+    'help'		=> 'Check status and ability to fiscalise receipts.',
+    'file'		=> array('type'=>'inc', 'module'=>'tps_pay_method', 'name'=>'tpspay.resource'),
+    'callback'	=> '_tpsrr_rro_works',
+    'access callback'=>'user_access',
+    'access arguments' => array('tps_paym_fiscal'),
+),
 ```
 
 ## Drupal-Specific Patterns
@@ -506,19 +519,6 @@ $dollar = variable_get('tps_cost_dollar', '');
 variable_set('tps_curr_place_id', $id);
 ```
 
-## Comparison with Standard PHP Coding Styles
-
-### Differences from PSR-2/PSR-12
-This codebase differs from PSR standards in several ways:
-
-1. **No space after control keywords**: `if($x)` instead of `if ($x)`
-2. **No space after =>**: `'key'=> 'value'` instead of `'key' => 'value'`
-3. **Omit braces for single-line statements**
-4. **Old array() syntax** (Drupal 7 / PHP 5.3 compatibility)
-5. **Tabs or spaces** (project-specific, not strictly enforced)
-
-These differences serve the compact, pragmatic style of the codebase.
-
 ## Best Practices
 
 ### Module Organization
@@ -554,11 +554,19 @@ if($cache = cache_get('tps_core_addphotos', 'cache')) {
 }
 ```
 
-## Conclusion
+## File-Top Design Notes
 
-This PHP style guide reflects the Drupal 7 era conventions mixed with compact, practical patterns developed for the TooPro project. When in doubt:
+Modules may open with a large doc block (often in Ukrainian/Russian) describing the whole algorithm — e.g. `tps_pay_method.module` starts with a numbered fiscalization flow. Preserve these; they are living documentation.
 
-1. Follow existing patterns in the module
-2. Maintain Drupal 7 compatibility
-3. Prioritize working code over style purity
-4. Document complex logic clearly
+## Commented-Out Code and Bracket Markers
+
+Commented-out blocks are kept when they record a decision — always with the reason attached. Deep closing brackets get trailing markers:
+
+```php
+/*'cron'=> array( //dont used, because receip_check do the cron job when needed
+    ...
+),*/
+
+    ))//rro
+);
+```

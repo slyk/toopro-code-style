@@ -92,7 +92,7 @@ for (const item of items) { }
 ```
 
 ### No Space After Colons in Type Annotations
-**Do not** add space after colon in type annotations:
+**Do not** add space after colon in type annotations (method params, interface fields, return types, local vars):
 ```typescript
 // ✅ Correct
 function process(value:string, count:number):boolean {
@@ -100,11 +100,30 @@ function process(value:string, count:number):boolean {
   return true;
 }
 
+interface TerminalConfig {
+  name:string;
+  host:string;
+  port:number;
+}
+
 // ❌ Wrong
 function process(value: string, count: number): boolean {
   const result: MyType = compute();
 }
 ```
+
+**Exception — NestJS constructor DI parameters get a space after the colon** (this is how recent code is written):
+```typescript
+// ✅ Correct
+constructor(
+  private readonly coinService: CoinService,
+  private readonly bonusVcardService: BonusVcardService,
+  private readonly lgr: TpsLogger
+) {
+  this.lgr.setContext('c6k.spend');
+}
+```
+Short abbreviated names for injected services are accepted and common: `srvc`, `lgr`.
 
 ### No Space Around Equality in Conditionals
 **Minimize** spacing around comparison operators:
@@ -215,44 +234,35 @@ const result:Promise<Data> = await fetchData();
 ```
 
 ### Arrow Functions
-**Inline** simple arrow functions without spacing around arrow:
+Keep simple arrows **inline**. Both spaced and compact arrows are accepted — recent code prefers spaced; never reformat one into the other:
 ```typescript
-// ✅ Correct
+// ✅ Correct — spaced (dominant in recent code)
+const data = [...this.terminals.values()].map(t => ({name: t.name, host: t.host, port: t.port}));
+conn.connect().catch(e => console.warn(`Failed to reconnect "${name}":`, e));
+
+// ✅ Also accepted — compact (older code)
 const ids = items.map(v=>v.id);
 const active = users.filter(u=>u.status==='active');
-const transform = (x:number)=>x*2;
-
-// ❌ Wrong - unnecessary spaces
-const ids = items.map(v => v.id);
-const transform = (x: number) => x * 2;
 ```
 
 ## Objects and Arrays
 
 ### Object Literals
-**No space** after colons in object literals:
+Space after colon in object literals is **fine** — recent code prefers it; compact form also accepted:
 ```typescript
-// ✅ Correct
-const config = {
-  host:'localhost',
-  port:3000,
-  timeout:5000,
-  enabled:true
-};
+// ✅ Correct — spaced (preferred in recent code)
+return {name: t.name, host: t.host, port: t.port, connected: t.connected};
 
-// ❌ Wrong
-const config = {
-  host: 'localhost',
-  port: 3000
-};
+// ✅ Also accepted — compact
+const config = {host:'localhost', port:3000, timeout:5000};
 ```
 
 ### Inline Short Objects
 **Keep** short objects on single line:
 ```typescript
 // ✅ Correct
-const point = {x:10, y:20};
-const user = {id:'123', name:'John', active:true};
+const point = {x: 10, y: 20};
+const user = {id: '123', name: 'John', active: true};
 
 // ❌ Wrong - unnecessary line breaks for short objects
 const point = {
@@ -400,6 +410,51 @@ console.warn('invalid state:', state);
 console.error('failed to process:', error);
 ```
 
+## Section Banner Comments
+
+Group related methods in services and controllers with banner comments:
+```typescript
+//////////////////////////////////////////////////////////
+// CONNECT METHODS
+
+async connect(host:string, port:number, force = false, name = 'default') { }
+async ping(name?:string, ip?:string) { }
+
+
+//////////////////////////////////////////////////////////
+// MONEY METHODS
+```
+
+## Multi-Statement One-Liner Guards
+
+When a guard needs a log + return, keep both statements braced on ONE line:
+```typescript
+// ✅ Correct
+if(!request.amount) {this.lgr.warn(`requestCoin: no amount for ${request.place}.`); return 'no amount';}
+if(!request.vcard ) {this.lgr.warn('requestCoin: no vcard in request' ); return 'no vcard'; }
+```
+
+## Comment Markers
+
+- `//TODO` — no space after `//` (project convention)
+- `//!!fut` / `//!!future` / `//!!maybe` — markers for future improvements / open questions; keep intact
+- Step comments inside methods often omit the space: `//validate`, `//check balance`
+
+## NestJS Controller Patterns
+
+Boolean query params come in as string flags, compared explicitly:
+```typescript
+@Get('connect')
+async connect(
+  @Query('host') host:string,
+  @Query('port', ParseIntPipe) port:number,
+  @Query('force') forceStr = '0',
+  @Query('name') name = 'default'
+) {
+  return await this.srvc.connect(host, port, forceStr === '1', name);
+}
+```
+
 ## General Principles
 
 1. **Horizontal over Vertical**: Prioritize compact horizontal code over vertical expansion
@@ -419,8 +474,8 @@ export class PaymentService {
   static DEFAULT_TIMEOUT = 5000;
 
   constructor(
-    private readonly db:DatabaseService,
-    private readonly logger:Logger
+    private readonly db: DatabaseService,
+    private readonly logger: Logger
   ) {}
 
   async processPayment(orderId:string, amount:number):Promise<PaymentResult|null> {
@@ -435,11 +490,11 @@ export class PaymentService {
       return null;
     }
 
-    const payment = await this.createPayment({orderId:orderId, amount:amount, status:'pending'});
+    const payment = await this.createPayment({orderId: orderId, amount: amount, status: 'pending'});
     const result = await this.gateway.charge(payment.id, amount);
 
-    if(result.success) return {payment:payment, status:'completed', transactionId:result.id};
-    else return {payment:payment, status:'failed', error:result.error};
+    if(result.success) return {payment: payment, status: 'completed', transactionId: result.id};
+    else return {payment: payment, status: 'failed', error: result.error};
   }
 }
 ```

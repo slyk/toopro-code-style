@@ -1,6 +1,6 @@
 # ActionScript 3 / Adobe Flex Code Style Guide
 
-This document defines ActionScript3 and MXML-specific code style used in the TooPro retail interface (tps_retail/swf). For cross-language patterns, see [code_style_general.md](code_style_general.md).
+This document defines ActionScript3 and MXML-specific code style used in the TooPro retail interface (tps_retail/swf). For cross-language patterns, see [general.md](general.md).
 
 ## Technology Stack
 
@@ -200,6 +200,47 @@ private function _sortProducts(a:Object, b:Object, fields = null):int { }
 
 ## PureMVC Patterns
 
+### Mediator "std init" Template
+Every mediator starts with the same marked block: `NAME` const, one-line constructor, one-line typed `vw` getter. Reproduce it exactly when creating a new mediator:
+
+```actionscript
+// ✅ Correct
+public class ConfirmBoxMediator extends Mediator implements IMediator {
+    //std init start
+    public static const NAME:String = "ConfirmBoxMediator";
+    public function ConfirmBoxMediator(viewComponent:Object = null) { super(NAME, new ConfirmBoxFull()); init(); }
+    public function get vw():ConfirmBoxFull {return viewComponent as ConfirmBoxFull;}  //view component
+    //std init end
+```
+
+### One-Line Short Methods
+Short methods and getters keep the whole body on the signature line:
+
+```actionscript
+// ✅ Correct
+public function get vw():ConfirmBoxFull {return viewComponent as ConfirmBoxFull;}
+public function get prods():Array { return data as Array; }
+```
+
+### Doc Comments on Private Fields
+Non-obvious private vars get full `/** */` doc blocks explaining **why** the field exists:
+
+```actionscript
+// ✅ Correct
+/**
+ * True while box is being initialized (fillUp + addPopUp). Suppresses
+ * PAY_TYPE_CHANGED notification during auto-commit of cashless DropDownList
+ * (would cause spurious split-flip + retrigger loop).
+ */
+private var _initializing:Boolean = false;
+
+/**
+ * last edited field id, used to know which field was edited last,
+ * used to try not to change its value when we have another field changed
+ */
+private var lastEditedField:String = 'numValue';
+```
+
 ### Proxy Pattern
 Standard structure for data proxies:
 
@@ -302,21 +343,24 @@ var statuses:Array = [
 ```
 
 ### Object Literals
-Use curly braces with colons:
+Inline objects are written **compact** (no space after colon) — dominant form in real code. Multiline notification objects may use a space after colon; both accepted:
 
 ```actionscript
-// ✅ Correct
-var config:Object = {
-    timeout: 5000,
-    retries: 3,
-    enabled: true
-};
+// ✅ Correct — inline compact (dominant)
+var statuses:Array = [
+    {label:"Завершена", value:TS_FINISHED, color:0x006400},
+    {label:"Видалена", value:TS_DELETED, color:0x8B0000}
+];
 
+// ✅ Also accepted — multiline spaced
 sendNotification(MVCConst.N_CONSOLE, {
     msg: 'Error occurred',
     type: RFC3164.MSG_ERROR
 });
 ```
+
+### String Quotes
+Single quotes preferred, but double quotes are common (~20% of the code, e.g. `NAME:String = "ConfirmBoxMediator"`, UI labels with Cyrillic text). Both accepted — don't convert existing ones.
 
 ### For-Each Loops
 **Prefer** for-each for iterating collections:
@@ -619,91 +663,16 @@ if(pInfo.cached == '0') trace(pInfo);
 if(DEBUG_MODE) trace('Processing: ' + item.id);
 ```
 
-## Comparison with Standard AS3 Styles
+## Vertical Alignment
 
-### Differences from Adobe/Apache Flex Conventions
-
-This codebase differs from standard Flex conventions:
-
-1. **No space after control keywords**: `if(x)` instead of `if (x)`
-2. **No space after colons**: `var x:String` instead of `var x: String`
-3. **Underscore prefix** for private methods (common pattern, but not universal)
-4. **Compact style** - minimal vertical spacing
-5. **Mixed language comments** (Ukrainian/Russian alongside English)
-
-These differences reflect the practical, compact style consistent across all TooPro codebases.
-
-## Best Practices
-
-### Memory Management
-Clean up resources properly:
+Extra spaces aligning related statements into columns are deliberate — preserve them:
 
 ```actionscript
 // ✅ Correct
-// Clear ByteArray after use
-var ba:ByteArray = new ByteArray();
-ba.writeObject(trans.data.products);
-ba.position = 0;
-trans.data.products = ba.readObject();
-ba.clear(); // Free memory
+if(this._bonusEnabled) ret -= vw.bonusComponent.getFinalValueToUse();
+if(this._allowDebt)    ret -= vw.numDebt.value;
 ```
 
-### Event Listeners
-Remove listeners when done:
+## File-Top Design Notes
 
-```actionscript
-// ✅ Correct
-// In cleanup/destructor
-if(_imgListeners.hasOwnProperty(uuid)) {
-    delete _imgListeners[uuid];
-}
-```
-
-### Null Safety
-Always check before accessing properties:
-
-```actionscript
-// ✅ Correct
-if(product && product.image_url && product.image_url.length > 0) {
-    useImageUrl(product.image_url);
-}
-```
-
-## Performance Considerations
-
-### Array Operations
-Use appropriate methods:
-
-```actionscript
-// ✅ Correct - Clear array efficiently
-prods.splice(0, prods.length);
-
-// Push items
-prods.push(prod);
-
-// Filter with callback
-f.filterFunction = _filterProdsFunction;
-f.refresh();
-```
-
-### Object Pooling
-Reuse objects when possible:
-
-```actionscript
-// ✅ Correct
-private var _imgListeners:Object = {}; // Reuse same object
-
-// Add/remove entries
-_imgListeners[uuid] = listener;
-delete _imgListeners[uuid];
-```
-
-## Conclusion
-
-This ActionScript3/Flex style guide reflects the PureMVC architecture patterns combined with the compact, practical coding style used throughout the TooPro project. When in doubt:
-
-1. Follow existing PureMVC patterns (Proxy, Mediator, Command)
-2. Maintain compact, readable code
-3. Use strong typing consistently
-4. Document public APIs clearly
-5. Keep ActionScript and MXML components focused and single-purpose
+Files may open with a block comment (often Russian/Ukrainian) explaining the class's role and usage patterns — e.g. `ConfirmBoxMediator.as` explains how mediators work. Preserve these.

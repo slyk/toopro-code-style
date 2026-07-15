@@ -5,9 +5,9 @@ This document defines cross-language code style patterns used across the TooPro 
 ## Language-Specific Guides
 
 This general guide is supplemented by language-specific style guides:
-- **TypeScript**: [tps-srv/code_style.md](code_style_ts.md) - TypeScript/NestJS code style
-- **PHP**: [code_style_php.md](code_style_php.md) - PHP/Drupal code style
-- **ActionScript3**: [code_style_as3.md](code_style_as3.md) - ActionScript3/Flex code style
+- **TypeScript**: [typescript.md](typescript.md) - TypeScript/NestJS code style
+- **PHP**: [php.md](php.md) - PHP/Drupal code style
+- **ActionScript3**: [as3.md](as3.md) - ActionScript3/Flex code style
 
 ## Core Principles
 
@@ -73,6 +73,35 @@ if(strlen($phone)==13 && substr($phone, 0, 4) == '0380') $phone = substr($phone,
 ```actionscript
 // ✅ Correct
 public var timestamp:uint;  // Last time app received available product values from server
+```
+
+### Comment Markers
+
+- `//TODO` — written without a space after `//` (project convention, 23+ occurrences)
+- `//!!fut`, `//!!future`, `//!!maybe` — project markers for "future improvement / open question"; preserve them exactly when editing nearby code
+- Short inline notes may omit the space after `//` (`//validate`, `return x;//reason`) — accepted, don't reformat
+
+### File-Top Design Notes
+
+**Allow** (and preserve) large doc blocks at the top of a file describing the overall algorithm or design decisions, often in Ukrainian/Russian. Example: `tps_pay_method.module` opens with a numbered fiscalization algorithm. These are documentation, not dead comments — never strip them.
+
+### Commented-Out Code — Keep With Reason
+
+Commented-out blocks are kept when they document a decision. Always attach the reason:
+
+```php
+/*'cron'=> array( //dont used, because receip_check do the cron job when needed
+    ...
+),*/
+```
+
+### Closing-Bracket Trailing Markers
+
+On deeply nested structures, a trailing comment marks what the bracket closes:
+
+```php
+    ))//rro
+);
 ```
 
 ### Mixed Language Comments
@@ -327,25 +356,30 @@ trace('Product image request for ' + product.nid);
 - One blank line between functions
 - Use sparingly within functions to group related statements
 
-## Version Control
+### Vertical Alignment (deliberate)
+Extra spaces/tabs used to align related lines into columns are **intentional** — never collapse them:
 
-### Commit Messages
-- Write clear, concise commit messages
-- Start with verb in present tense
-- Reference issue/task numbers when applicable
+```php
+'help'		=> 'Check status...',
+'file'		=> array('type'=>'inc', 'module'=>'tps_pay_method'),
+'callback'	=> '_tpsrr_rro_works',
+```
 
-### Code Review
-- Focus on logic and correctness over style minutiae
-- Suggest improvements without blocking on non-critical style
-- Respect existing patterns in established codebases
+```actionscript
+if(this._bonusEnabled) ret -= vw.bonusComponent.getFinalValueToUse();
+if(this._allowDebt)    ret -= vw.numDebt.value;
+```
 
-## Conclusion
+### Section Banner Comments
+Group related methods with banner comments (used across TS services/controllers and AS3 mediators):
 
-This style guide emphasizes **pragmatism over dogma**. The goal is maintainable, working code that solves real problems. When in doubt:
+```typescript
+//////////////////////////////////////////////////////////
+// CONNECT METHODS
+```
 
-1. Follow existing patterns in the codebase
+## When in Doubt
+
+1. Follow existing patterns in the file you are editing
 2. Prioritize clarity and correctness
-3. Make changes that improve without disrupting
-4. Document complex decisions
-
-Remember: **The best code is code that works, is understood by the team, and can be maintained over time.**
+3. Never mass-reformat surrounding code while making a change
