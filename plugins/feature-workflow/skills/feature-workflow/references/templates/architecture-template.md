@@ -1,5 +1,7 @@
 # System Architecture
 
+> Optional. Create this file only if the project wants an architecture overview and doesn't already have one in `CLAUDE.md`/`AGENTS.md` or the knowledge base.
+
 **Last updated:** {YYYY-MM-DD}
 
 ## Overview

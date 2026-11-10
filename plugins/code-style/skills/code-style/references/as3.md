@@ -1,6 +1,6 @@
 # ActionScript 3 / Adobe Flex Code Style Guide
 
-This document defines ActionScript3 and MXML-specific code style used in the TooPro retail interface (tps_retail/swf). For cross-language patterns, see [general.md](general.md).
+ActionScript3 and MXML specifics for the TooPro retail interface (tps_retail/swf). The core formatting rules (keyword spacing, type-annotation colons, K&R braces, brace-less single statements and if/else, long lines, comment markers, alignment) are in `SKILL.md` and are not repeated here. Comment and naming habits (mixed-language comments, file-top notes) are in [general.md](general.md).
 
 ## Technology Stack
 
@@ -33,45 +33,6 @@ package model {
 
 ## Spacing and Formatting
 
-### Control Structures
-**No space** after control keywords (consistent with PHP and TypeScript style):
-
-```actionscript
-// ✅ Correct
-if(condition) {
-    doSomething();
-}
-
-for(var i:int = 0; i < items.length; i++) {
-    process(items[i]);
-}
-
-while(running) {
-    tick();
-}
-
-// ❌ Wrong
-if (condition) {
-    doSomething();
-}
-```
-
-### Type Annotations
-**No space** after colon in type annotations (compact style):
-
-```actionscript
-// ✅ Correct
-private var spp:SellPlaceProxy;
-public var timestamp:uint;
-public function loadProducts():void {
-    var fields:Array = ['title', 'price', 'avail'];
-}
-
-// ❌ Wrong
-private var spp: SellPlaceProxy;
-public var timestamp: uint;
-```
-
 ### Function Declarations
 Compact function signatures:
 
@@ -92,72 +53,6 @@ private function _loadedProducts(req:AMFProxyRequest):void {
 // Multi-parameter functions
 public function saveProduct(prodNID:uint, diffHash:Object):Boolean {
     // implementation
-}
-```
-
-## Braces and Control Flow
-
-### Opening Braces
-**Always** place opening brace on same line (K&R style):
-
-```actionscript
-// ✅ Correct
-public class ProductsProxy extends Proxy implements IProxy {
-    public function loadProducts():void {
-        if(condition) {
-            // code
-        }
-    }
-}
-
-// ❌ Wrong
-public class ProductsProxy extends Proxy implements IProxy
-{
-    public function loadProducts():void
-    {
-    }
-}
-```
-
-### Single-Line Conditionals
-**Omit braces** for single-line if/return statements:
-
-```actionscript
-// ✅ Correct
-if(!spp) spp = facade.retrieveProxy(SellPlaceProxy.NAME) as SellPlaceProxy;
-if(!req.data) return;
-if(currNoteType != null) return;
-
-// Multiple guards
-if(!trans) return;
-if(trans.value >= 50000) {
-    showError('Transaction too large');
-    return;
-}
-
-// ❌ Wrong - unnecessary braces
-if(!trans) {
-    return;
-}
-```
-
-### if/else with single-statement branches — never use braces
-When both `if` and `else` branches contain a single statement, write without braces. Each branch on its own line. Inline comments go at end of the line — **never** inside a block:
-
-```actionscript
-// ✅ Correct
-if(t.type==OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) _prepareSplitCheckout(t, ord);
-else sendNotification(MVCConst.CART_CONFIRM, t, 'show box'); // No split needed
-
-if(status==TS_FINISHED) sendNotification(MVCConst.TRANS_DONE, t);
-else sendNotification(MVCConst.TRANS_PENDING, t);
-
-// ❌ Wrong - expanding single-statement branches into blocks
-if(t.type == OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) {
-    _prepareSplitCheckout(t, ord);
-} else {
-    // No split needed
-    sendNotification(MVCConst.CART_CONFIRM, t, 'show box');
 }
 ```
 
@@ -384,17 +279,6 @@ for(var i:int = 0; i < items.length; i++) {
 
 ## Constants
 
-### Naming
-Use **UPPER_SNAKE_CASE** for constants:
-
-```actionscript
-// ✅ Correct
-public static const NAME:String = 'ProductsProxy';
-public static const TS_FINISHED:int = 100;
-public static const TS_DELETED:int = -5;
-public static const TS_PREORDER:int = 5;
-```
-
 ### Grouping
 Group related constants in a class:
 
@@ -453,46 +337,7 @@ for each(var arrProd:Object in req.data) {
 sendNotification(MVCConst.LD_PRODUCTS, this);
 ```
 
-### Mixed Language Comments
-**Allow** Ukrainian/Russian in comments:
-
-```actionscript
-// ✅ Acceptable
-// проблема в том, что транзакция содержит ссылки на ProductVO в массиве товаров
-var ba:ByteArray = new ByteArray();
-ba.writeObject(trans.data.products);
-
-// если сейчас статус больше или равен "оплачен"
-if(status >= TPSTrans::S_PAYED && oldStatus < TPSTrans::S_PAYED) {
-    // delta debt value of the user
-    upd.users[trans.usr_they].debt = trans.data.debt;
-}
-```
-
 ## Error Handling
-
-### Early Returns
-**Favor** early returns for validation:
-
-```actionscript
-// ✅ Correct
-public function send(trans:TransactionVO):void {
-    if(currNoteType != null) return;
-
-    lastTransaction = trans;
-
-    // block transactions >50k
-    if(trans.value >= 50000 && trans.type == OrderProxy.TT_SELL) {
-        sendNotification(MVCConst.N_CONSOLE, {
-            type: RFC3164.MSG_ERROR,
-            msg: 'Транзакция не может быть больше 50 тыс.'
-        });
-        return;
-    }
-
-    AMFProxy.instance.newreq('transaction', 'add').listen(_transactionSent).call(trans);
-}
-```
 
 ### Null Checks
 Check for null/undefined before use:
@@ -662,17 +507,3 @@ Use for development debugging:
 if(pInfo.cached == '0') trace(pInfo);
 if(DEBUG_MODE) trace('Processing: ' + item.id);
 ```
-
-## Vertical Alignment
-
-Extra spaces aligning related statements into columns are deliberate — preserve them:
-
-```actionscript
-// ✅ Correct
-if(this._bonusEnabled) ret -= vw.bonusComponent.getFinalValueToUse();
-if(this._allowDebt)    ret -= vw.numDebt.value;
-```
-
-## File-Top Design Notes
-
-Files may open with a block comment (often Russian/Ukrainian) explaining the class's role and usage patterns — e.g. `ConfirmBoxMediator.as` explains how mediators work. Preserve these.

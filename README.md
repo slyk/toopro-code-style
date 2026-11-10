@@ -1,160 +1,70 @@
-# TooPro Code Style Guides
+# TooPro Code Style and Workflow
 
-This repository contains comprehensive code style guides used across the TooPro project ecosystem. These guides define the coding standards, conventions, and best practices for multiple programming languages and frameworks.
+Two Claude Code plugins used across the TooPro projects. The rules themselves are not repeated here; each lives in exactly one file, linked below.
 
-## Overview
+| Plugin | What it does | Entry file |
+|---|---|---|
+| `code-style` | The compact, horizontal-first TooPro code style for TypeScript/NestJS, PHP/Drupal 7 and ActionScript3/Flex | [SKILL.md](plugins/code-style/skills/code-style/SKILL.md) |
+| `feature-workflow` | A four-phase workflow for significant features: DECIDE (ADR), PLAN, BUILD, CLOSE (knowledge base) | [SKILL.md](plugins/feature-workflow/skills/feature-workflow/SKILL.md) |
 
-The TooPro code style emphasizes **pragmatism**, **compactness**, and **horizontal space usage** over rigid adherence to conventional style guides. Our philosophy prioritizes working, maintainable code that solves real business problems.
+## code-style
 
-## Core Principles
+- [SKILL.md](plugins/code-style/skills/code-style/SKILL.md) — the core rules for all three languages, in three tiers: always, either form, never touch
+- [typescript.md](plugins/code-style/skills/code-style/references/typescript.md) — TypeScript/NestJS specifics (**TpsSrv2** monorepo)
+- [php.md](plugins/code-style/skills/code-style/references/php.md) — PHP/Drupal 7 specifics (**TooPro Drupal** backend)
+- [as3.md](plugins/code-style/skills/code-style/references/as3.md) — ActionScript3/Flex/PureMVC specifics (**tps_retail** point of sale)
+- [general.md](plugins/code-style/skills/code-style/references/general.md) — comments, documentation, naming, class layout
 
-1. **Practical Over Theoretical** - Favor working solutions over architectural purity
-2. **Minimal Spacing Philosophy** - Reduce unnecessary whitespace; compact horizontal code
-3. **Direct Communication** - Clear, descriptive naming; comments explain "why" not "what"
-4. **Mixed Language Support** - Allow native language (Ukrainian/Russian) comments when natural
+The style is for developers, reviewers and AI assistants alike. It differs from Prettier defaults, so do not run a formatter over the code.
 
-## Style Guides
+## feature-workflow
 
-> **Note**: Style guide files live in `plugins/code-style/skills/code-style/references/` —
-> this repo is also a Claude Code skill (see [Installing as a Claude Code Skill](#installing-as-a-claude-code-skill) below).
+- [SKILL.md](plugins/feature-workflow/skills/feature-workflow/SKILL.md) — when the workflow applies and the rules
+- [workflow.md](plugins/feature-workflow/skills/feature-workflow/references/workflow.md) — the four phases in detail
+- [templates/](plugins/feature-workflow/skills/feature-workflow/references/templates/) — ADR, implementation plan, progress, optional split specs
 
-### [General Code Style](plugins/code-style/skills/code-style/references/general.md)
-Cross-language patterns and principles applicable to all TooPro projects:
-- Naming conventions
-- Code organization
-- Error handling patterns
-- Documentation standards
-- Formatting flexibility
+It writes into an `_ai/` folder at the project root: `decisions/`, `implementations/`, `knowledge-base/`.
 
-### [TypeScript Code Style](plugins/code-style/skills/code-style/references/typescript.md)
-TypeScript/NestJS specific style for the **TpsSrv2** microservices monorepo:
-- Compact spacing (no space after `if`, `for`, `while`)
-- Single-line conditionals without braces
-- No space after colons in type annotations: `value:string`
-- Heavy use of optional chaining: `item?.value??defaultValue`
-- Single quotes for strings
+## Installing
 
-**Technology Stack**: NestJS, TypeScript, Nx monorepo, RabbitMQ, Directus CMS
+This repo is a Claude Code plugin marketplace. In a project's `.claude/settings.json`:
 
-### [PHP Code Style](plugins/code-style/skills/code-style/references/php.md)
-PHP/Drupal 7 specific style for the **TooPro Drupal** backend:
-- Compact control structures: `if($condition) { }`
-- No space after `=>` in arrays: `'key'=> 'value'`
-- Old-style `array()` syntax (PHP 5.3/Drupal 7 compatible)
-- Single-line conditionals without braces
-- Drupal-specific patterns (hooks, Form API, database queries)
-
-**Technology Stack**: Drupal 7, PHP 5.3+, MySQL, AMF
-
-### [ActionScript 3 Code Style](plugins/code-style/skills/code-style/references/as3.md)
-ActionScript3/Adobe Flex specific style for the **tps_retail** point-of-sale interface:
-- No space after control keywords: `if(condition) { }`
-- No space after colons: `var x:String`
-- PureMVC architecture patterns (Proxy, Mediator, Command)
-- Underscore prefix for private methods: `_loadedProducts()`
-- Strong typing throughout
-
-**Technology Stack**: Adobe Flex 4.x, ActionScript 3.0, PureMVC, AMF
-
-## Key Style Characteristics
-
-### Spacing
-- **No space** after `if`, `for`, `while`, `switch` keywords
-- **No space** after colons in type annotations
-- **Minimal spacing** around operators when it improves compactness
-
-### Braces
-- **K&R style** - opening brace on same line
-- **Omit braces** for single-line conditionals
-- **Inline statements** when appropriate
-
-### Type Annotations
-```typescript
-// TypeScript
-function process(value:string, count:number):boolean { }
-
-// ActionScript3
-public function process(value:String, count:Number):Boolean { }
+```json
+{
+  "extraKnownMarketplaces": {
+    "toopro-code-style": {
+      "source": { "source": "github", "repo": "slyk/toopro-code-style" }
+    }
+  },
+  "enabledPlugins": {
+    "code-style@toopro-code-style": true,
+    "feature-workflow@toopro-code-style": true
+  }
+}
 ```
 
-### Control Flow
-```typescript
-// Single-line conditionals
-if(!id) return null;
-if(value <= 0) value = 0; else value = Math.round(value * 100) / 100;
-
-// Guards
-if(!data) throw new Error('missing data');
-if(status !== 'active') return;
-```
-
-### Arrays and Objects
-```typescript
-// Compact object literals
-const point = {x:10, y:20};
-const config = {host:'localhost', port:3000, timeout:5000};
-
-// Arrays
-const items = ['item1', 'item2', 'item3'];
-```
-
-## Usage
-
-These style guides are designed to be used by:
-
-1. **Developers** - Follow these conventions when writing code for TooPro projects
-2. **Code Reviewers** - Reference when reviewing pull requests
-3. **AI Code Assistants** - Claude Code, GitHub Copilot, and other AI tools should adhere to these styles
-4. **Linters/Formatters** - Configure ESLint, Prettier, and other tools to match these rules
-
-## Project Context
-
-### Related Repositories
-- **TpsSrv2** - NestJS microservices monorepo (TypeScript)
-- **TooPro Drupal** - Legacy Drupal 7 backend (PHP)
-- **tps_retail** - Point-of-sale Flash/Flex interface (ActionScript3)
-
-## Contributing
-
-When contributing to TooPro projects:
-
-1. Read the appropriate language-specific style guide
-2. Review the general code style guide for cross-language patterns
-3. Follow existing patterns in the codebase
-4. Prioritize clarity and correctness over style perfection
-5. When in doubt, check similar code in the same project
-
-## Philosophy
-
-> **The best code is code that works, is understood by the team, and can be maintained over time.**
-
-These guides emphasize:
-- **Compactness** without sacrificing readability
-- **Pragmatism** over dogmatic adherence to standards
-- **Consistency** within each project
-- **Flexibility** when circumstances require it
-
-## Installing as a Claude Code Skill
-
-This repo is a self-contained Claude Code plugin. On any computer where you've cloned it:
+Or from the command line, once per project:
 
 ```bash
-# Add this repo as a marketplace (once per project)
-claude plugin marketplace add /path/to/code_style --scope project
+claude plugin marketplace add slyk/toopro-code-style --scope project
+```
 
-# Install the skill
+```bash
 claude plugin install code-style@toopro-code-style --scope project
 ```
 
-The skill automatically guides Claude to follow these code style rules whenever it writes or reviews code.
+```bash
+claude plugin install feature-workflow@toopro-code-style --scope project
+```
 
-To use across multiple projects, run both commands in each project directory.
+To work from a local clone instead, pass its path to `marketplace add`.
+
+## Changing the rules
+
+- Write each rule in one file only. Cross-language formatting goes in `code-style/SKILL.md`; a language file holds only what is specific to that language.
+- Make examples marked as correct follow every other rule too — examples are copied more than prose.
+- Bump `version` in `.claude-plugin/marketplace.json` and in the plugin's `plugin.json` with every change, so installed copies update.
 
 ## License
 
-These style guides are proprietary to the TooPro project.
-
----
-
-**Last Updated**: December 2024
-**Maintained By**: TooPro Development Team
+These guides are proprietary to the TooPro project.

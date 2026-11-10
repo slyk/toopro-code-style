@@ -1,8 +1,10 @@
 # ADR-{N}: {Feature Title}
 
 **Date:** {YYYY-MM-DD}
-**Status:** Proposed | Approved | Rejected | Superseded by ADR-{N}
+**Status:** Proposed | Approved | Implemented ({YYYY-MM-DD}) | Rejected | Superseded by ADR-{N}
 **Deciders:** {who approved}
+
+> An ADR records **why** a design was chosen. Keep file lists, field lists and task lists out of it — they belong in the implementation plan. Refer to code by class/method name, never by line number.
 
 ## Context
 
@@ -16,21 +18,11 @@ What is the problem or opportunity? Why does this decision need to be made?
 
 ## Affected Areas
 
-List the parts of the system affected by this change. Be specific — name projects, modules, services, or layers.
+Name the projects, services or codebases this touches, one line each. Say whether the data model or a contract (message, API, shared type) changes; the details go in the plan.
 
-### Backend
-- `{service/module}` — {what changes}
-
-### Frontend
-- `{component/module}` — {what changes}
-
-### Shared / Libs
-- `{lib}` — {what changes}
-
-### Database
-- `{collection/table}` — {what changes}
-
-> **Note:** Remove sections that don't apply. If the feature is backend-only, remove Frontend. If no DB changes, remove Database.
+- `{service / lib / codebase}` — {what changes, in one line}
+- Data model: {unchanged | changes — one line on what and why}
+- Contracts: {unchanged | changes — one line on what and why}
 
 ## Options Considered
 

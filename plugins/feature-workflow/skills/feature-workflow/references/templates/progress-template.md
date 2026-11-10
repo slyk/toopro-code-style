@@ -4,36 +4,47 @@
 **Started:** {YYYY-MM-DD}
 **Status:** Not Started | In Progress | Complete
 
+> Tick a box only when the thing is true. Tasks are named here and described in the plan. Remove sections that don't apply. `[ ]` not started, `[x]` completed, `[!]` blocked.
+
 ## Phase 1: DECIDE
-- [x] ADR created and approved
+- [ ] ADR created
+- [ ] ADR approved by user ({YYYY-MM-DD})
 
 ## Phase 2: PLAN
-- [x] Implementation plan created
-- [ ] Backend implementation spec created (if applicable)
-- [ ] Frontend implementation spec created (if applicable)
-- [ ] Shared implementation spec created (if applicable)
-- [ ] Plan approved by user
+- [ ] Implementation plan created
+- [ ] Split specs created (only if the plan was split)
+- [ ] Plan approved by user ({YYYY-MM-DD})
 
 ## Phase 3: BUILD
 
-### Shared / Types
-- [ ] {task description}
-
 ### Database (Proposals)
-- [ ] {data structure change proposal documented}
+- [ ] Field list sent to the user / DB engineer
+- [ ] Changes confirmed present
+
+### Shared / Types
+- [ ] {task name}
 
 ### Backend
-- [ ] {task description}
+- [ ] {task name}
 
-### Frontend
-- [ ] {task description}
+### Frontend / Client
+- [ ] {task name}
 
-### Integration
-- [ ] End-to-end testing
-- [ ] Architecture docs updated
-- [ ] Knowledge base updated (if applicable)
+### Verification
 
-> **Instructions:** Remove sections that don't apply. Add specific tasks from the implementation specs. Update status as you work: `[ ]` not started, `[x]` completed, `[!]` blocked.
+> One row per item of the plan's Verification section. "Not verified" with a reason is a valid result; "passed" without running it is not.
+
+| Criterion | What was run | Result |
+|-----------|--------------|--------|
+| AC1 | `{command}` / steps | Passed / Failed / Not verified — {reason} |
+
+## Phase 4: CLOSE
+- [ ] Knowledge base written or updated: `_ai/knowledge-base/{topic}.md`
+- [ ] ADR status set to `Implemented ({YYYY-MM-DD})`, requirements ticked or annotated
+- [ ] Implementation plan status set to `Complete`
+- [ ] Architecture docs updated (only if the project keeps them and architecture changed)
+- [ ] Every box above is true (done, or removed with a note); status at the top set to `Complete`
+- [ ] User confirmed the feature is done
 
 ## Blockers
 

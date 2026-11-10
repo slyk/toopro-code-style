@@ -2,6 +2,8 @@
 
 **ADR:** ADR-{N}-{slug}
 
+> **Optional split spec.** Use this file only when the implementation plan was split (separate builders, or a plan past roughly 300 lines). It holds the detail of this area; the plan keeps a one-line summary and a link. Do not repeat anything written in the plan. Refer to code by class/method name, no line numbers.
+
 ## DTOs / Interfaces
 
 ### {DtoName}

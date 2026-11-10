@@ -1,6 +1,6 @@
 # PHP Code Style Guide (TooPro/Drupal)
 
-This document defines PHP-specific code style used in the TooPro Drupal 7 project. For cross-language patterns, see [general.md](general.md).
+PHP/Drupal 7 specifics for the TooPro Drupal project. The core formatting rules (keyword spacing, K&R braces, brace-less single statements and if/else, long lines, comment markers, alignment) are in `SKILL.md` and are not repeated here. Comment and naming habits (mixed-language comments, file-top notes, commented-out code, bracket markers) are in [general.md](general.md).
 
 ## PHP Version and Framework
 
@@ -87,28 +87,6 @@ node_save($node);
 
 ## Braces and Control Flow
 
-### Opening Braces
-**Always** place opening brace on same line (K&R style):
-
-```php
-// ✅ Correct
-class MyClass {
-    public function method() {
-        if($condition) {
-            // code
-        }
-    }
-}
-
-// ❌ Wrong
-class MyClass
-{
-    public function method()
-    {
-    }
-}
-```
-
 ### Ternary Over if/else for Assignments
 **Prefer ternary** when assigning a variable based on a condition. For related/derived variables, reference the already-assigned variable — do not repeat the condition:
 
@@ -126,26 +104,6 @@ if(in_array($fieldName, $productRetailFields)) {
 } else {
     $collection = 'product';
     $server = 'core';
-}
-```
-
-### Single-Line Conditionals
-**Omit braces** for single-line if/else/return statements:
-
-```php
-// ✅ Correct
-if(!$id) return null;
-if(!$data) throw new Exception('missing data');
-if($value <= 0) $value = 0; else $value = round($value * 100) / 100;
-
-// Multiple related guards
-if(!$id) return null;
-if(!is_numeric($id)) return services_error('Wrong user ID');
-$result = process($id);
-
-// ❌ Wrong - unnecessary braces
-if(!$id) {
-    return null;
 }
 ```
 
@@ -185,7 +143,7 @@ $items['admin/config/system/tps/rro'] = array(
 ```
 
 ### Tab-Aligned `=>` Columns
-In large config/resource arrays, `=>` are often aligned into a column with tabs — this is deliberate, preserve it:
+In large config/resource arrays, `=>` are often aligned into a column with tabs (the alignment rule in `SKILL.md` applies):
 
 ```php
 'works'=> array(
@@ -354,28 +312,6 @@ watchdog('TPS', "Trans !tid added: value @val", array(
 ), WATCHDOG_INFO);
 
 watchdog('tps_retail', "ERR trans ADD: <br><b>$res</b><pre>" . print_r($transaction, 1) . '</pre>');
-```
-
-### Return Early Pattern
-**Favor** early returns for validation:
-
-```php
-// ✅ Correct
-function tps_core_normalize_phone($phone) {
-    // regex replace all except numbers
-    $phone = preg_replace('/[^0-9]/', '', $phone);
-
-    // fix phones with old format
-    if(strlen($phone) == 13 && substr($phone, 0, 4) == '0380') $phone = substr($phone, 1);
-    if(strlen($phone) == 9) $phone = '0' . $phone;
-    if(strlen($phone) == 10) $phone = '38' . $phone;
-
-    // validation
-    if(strlen($phone) != 12) $phone = 0;
-    if(substr($phone, 0, 1) == '0') $phone = 0;
-
-    return $phone;
-}
 ```
 
 ## Comments
@@ -552,21 +488,4 @@ if($cache = cache_get('tps_core_addphotos', 'cache')) {
     // expensive operation
     cache_set('tps_core_addphotos', array('bprod'=> $bprod), time() + 60 * 60 * 24);
 }
-```
-
-## File-Top Design Notes
-
-Modules may open with a large doc block (often in Ukrainian/Russian) describing the whole algorithm — e.g. `tps_pay_method.module` starts with a numbered fiscalization flow. Preserve these; they are living documentation.
-
-## Commented-Out Code and Bracket Markers
-
-Commented-out blocks are kept when they record a decision — always with the reason attached. Deep closing brackets get trailing markers:
-
-```php
-/*'cron'=> array( //dont used, because receip_check do the cron job when needed
-    ...
-),*/
-
-    ))//rro
-);
 ```

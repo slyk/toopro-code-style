@@ -9,14 +9,14 @@
     {
       "name": "code-style",
       "description": "TooPro code style guide for TypeScript/NestJS, PHP/Drupal, and ActionScript3/Flex",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source": "./plugins/code-style",
       "category": "development"
     },
     {
       "name": "feature-workflow",
       "description": "AI-driven feature development workflow: ADR decisions, implementation plans, and build tracking",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source": "./plugins/feature-workflow",
       "category": "development"
     }

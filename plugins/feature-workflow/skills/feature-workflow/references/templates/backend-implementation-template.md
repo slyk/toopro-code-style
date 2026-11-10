@@ -2,24 +2,11 @@
 
 **ADR:** ADR-{N}-{slug}
 
-## Database Changes (Proposals for DB Engineer)
+> **Optional split spec.** Use this file only when the implementation plan was split (separate builders, or a plan past roughly 300 lines). It holds the detail of this area; the plan keeps a one-line summary and a link. Do not repeat anything written in the plan. Refer to code by class/method name, no line numbers.
 
-> Describe the required data structure. The DB engineer will implement these changes.
+## Database Changes
 
-### New Collections / Tables
-- **`{collection_name}`** — {purpose}
-  - `field_name` ({type}) — {description}
-  - `field_name` ({type}) — {description}
-
-### Modified Collections / Tables
-- **`{collection_name}`**
-  - Add `field_name` ({type}) — {description}
-
-### Relations
-- `{collection_a}.{field}` → `{collection_b}` — {description}
-
-### Indexes
-- `{collection}.{field}` — {reason for index}
+Listed once, in the "Database Changes (Proposals)" section of `implementation-plan.md`. Do not repeat them here; describe only how the services use the new fields.
 
 ## API Endpoints
 

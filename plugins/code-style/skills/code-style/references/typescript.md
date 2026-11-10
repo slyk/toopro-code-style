@@ -1,103 +1,28 @@
 # TypeScript Code Style Guide
 
-This document defines the specific TypeScript code style used in this project. These rules prioritize compactness and horizontal space usage over vertical expansion.
+TypeScript/NestJS specifics for the TpsSrv2 monorepo. The core formatting rules (keyword spacing, type-annotation colons, brace-less single statements, quotes, long lines, `?.`/`??`, one-line guards, banners, comment markers, alignment) and the either-form table (comparison spacing, arrows, object literals, constructor DI, `switch`) are in `SKILL.md` and are not repeated here. Comment and naming habits are in [general.md](general.md).
 
-## Braces and Control Flow
+## Statements on One Line
 
-### Opening Braces
-**Always** place opening brace on the same line (K&R style):
+Short related statements may share a line, separated by semicolons:
 ```typescript
 // ✅ Correct
-class MyClass {
-  method() {
-    if (condition) {
-      // code
-    }
-  }
-}
+if(value<=0) value = 0; else value = Math.round(value * 100) / 100;
+if(typeof result==='string') return result; else await wait();
 
-// ❌ Wrong
-class MyClass
-{
-  method()
-  {
-  }
-}
+// ✅ Correct - fetch + guard
+const id = getId(item); if(!id) return false;
 ```
 
-### Single-Line Conditionals
-**Omit braces** for single-line if/else statements:
+## Type Annotations
+
+### Generics, Function Types, Local Variables
+The compact colon rule also covers generic parameters, function types and local variables:
 ```typescript
 // ✅ Correct
-if(condition) doSomething();
-if(!value) throw new Error('missing value');
-if(x>0) return x;
-
-// ✅ Multiple related single-line conditions
-if(!id) return null;
-if(!data) throw new Error('no data');
-const result = process(data);
-
-// ❌ Wrong - unnecessary braces for single statement
-if(condition) {
-  doSomething();
-}
-```
-
-### if/else with single-statement branches — never use braces
-When both branches contain a single statement, write without braces. Each branch on its own line. Inline comments go at end of the line — never inside a block:
-```typescript
-// ✅ Correct
-if(t.type==OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) _prepareSplitCheckout(t, ord);
-else sendNotification(MVCConst.CART_CONFIRM, t, 'show box'); // No split needed
-
-if(result.success) return {payment, status:'completed', transactionId:result.id};
-else return {payment, status:'failed', error:result.error};
-
-// ❌ Wrong - expanding single-statement if/else into blocks
-if(t.type == OrderProxy.TT_SELL && ord.isWarrantySplitRequired()) {
-    _prepareSplitCheckout(t, ord);
-} else {
-    // No split needed - show confirm box normally
-    sendNotification(MVCConst.CART_CONFIRM, t, 'show box');
-}
-```
-Same rule applies to `else if`, `for`, and `while` — if the body is one statement, no braces.
-
-### Multiple Statements on Same Line
-Use semicolons to separate related statements on the same line:
-```typescript
-// ✅ Correct
-if (value <= 0) value = 0; else value = Math.round(value * 100) / 100;
-if (typeof result === 'string') return result; else await wait();
-
-// ✅ Correct - sequential short statements
-const id = getId(item); if (!id) return false;
-```
-
-## Spacing
-
-### No Space After Control Keywords
-**Do not** add space after `if`, `for`, `while`, `switch`:
-```typescript
-// ✅ Correct
-if(condition) { }
-for(const item of items) { }
-while(running) { }
-switch(value) { }
-
-// ❌ Wrong
-if (condition) { }
-for (const item of items) { }
-```
-
-### No Space After Colons in Type Annotations
-**Do not** add space after colon in type annotations (method params, interface fields, return types, local vars):
-```typescript
-// ✅ Correct
-function process(value:string, count:number):boolean {
-  const result:MyType = compute();
-  return true;
+function process<T>(items:T[], mapper:(item:T)=>string):string[] {
+  const result:Map<string,T> = new Map();
+  const value:string|number|null = getValue();
 }
 
 interface TerminalConfig {
@@ -107,104 +32,13 @@ interface TerminalConfig {
 }
 
 // ❌ Wrong
-function process(value: string, count: number): boolean {
-  const result: MyType = compute();
-}
-```
-
-**Exception — NestJS constructor DI parameters get a space after the colon** (this is how recent code is written):
-```typescript
-// ✅ Correct
-constructor(
-  private readonly coinService: CoinService,
-  private readonly bonusVcardService: BonusVcardService,
-  private readonly lgr: TpsLogger
-) {
-  this.lgr.setContext('c6k.spend');
-}
-```
-Short abbreviated names for injected services are accepted and common: `srvc`, `lgr`.
-
-### No Space Around Equality in Conditionals
-**Minimize** spacing around comparison operators:
-```typescript
-// ✅ Correct
-if(value==null) return;
-if(status==='active') process();
-if(x===y) return true;
-
-// ❌ Wrong
-if (value == null) return;
-if (status === 'active') process();
-```
-
-## Line Length and Breaking
-
-### Prefer Long Lines
-**Favor** keeping code on single lines even beyond 120-150 characters when it improves readability:
-```typescript
-// ✅ Correct - long line is acceptable
-this.logger.log(`calc cashback for '${trans.id}' paid ${trans.value}/${trans.cost??trans.value} uah, place ${trans.place}, vcard ${trans.vcard}.`, level, logArray);
-
-// ✅ Correct - complex return type on one line
-async function getData(id:string):Promise<Pick<DbSchema['records'][number], 'id'|'status'|'created'|'updated'>> {
-```
-
-### Method Chaining
-Chain methods on **single line** when reasonable, or **minimal lines**:
-```typescript
-// ✅ Correct - short chain on one line
-const query = dbqb<Product>().fields(['id','name']).sort(['-created']).limit(10);
-
-// ✅ Correct - longer chain with minimal lines
-const query = dbqb<Product>()
-  .equal('status', 'active')
-  .equal('type', ProductType.RETAIL)
-  .fields(['id','name','price']).limit(100).sort('-created');
-```
-
-## Strings and Quotes
-
-### Single Quotes Only
-**Always** use single quotes for strings:
-```typescript
-// ✅ Correct
-const message = 'hello world';
-const path = 'api/users';
-throw new Error('invalid input');
-
-// ❌ Wrong
-const message = "hello world";
-const path = "api/users";
-```
-
-### Template Literals
-Use backticks for string interpolation:
-```typescript
-// ✅ Correct
-console.log(`Processing item ${id} with status ${status}`);
-const url = `${baseUrl}/api/${endpoint}`;
-```
-
-## Type Annotations
-
-### No Spacing in Type Annotations
-**Omit** spaces after colons and in generic parameters:
-```typescript
-// ✅ Correct
-function process<T>(items:T[], mapper:(item:T)=>string):string[] {
-  const result:Map<string,T> = new Map();
-  const value:string|number|null = getValue();
-}
-
-// ❌ Wrong
 function process<T>(items: T[], mapper: (item: T) => string): string[] {
   const result: Map<string, T> = new Map();
 }
 ```
 
 ### Union Types Inline
-**Keep** union types on single line without breaks:
+**Keep** union types on a single line without breaks:
 ```typescript
 // ✅ Correct
 function getValue(input:string|number|null):Promise<Result|undefined|null> {
@@ -218,8 +52,6 @@ function getValue(
 }
 ```
 
-## Variables and Functions
-
 ### Type Inference Preferred
 **Allow** TypeScript to infer types when obvious:
 ```typescript
@@ -230,39 +62,47 @@ const result = await fetchData();
 
 // ❌ Unnecessary - type is obvious
 const count:number = 0;
-const result:Promise<Data> = await fetchData();
 ```
 
-### Arrow Functions
-Keep simple arrows **inline**. Both spaced and compact arrows are accepted — recent code prefers spaced; never reformat one into the other:
+### Constructor DI
+Constructor DI parameters are usually written with a space after the colon (either form is fine, see `SKILL.md`). Short abbreviated names for injected services are accepted and common: `srvc`, `lgr`.
 ```typescript
-// ✅ Correct — spaced (dominant in recent code)
-const data = [...this.terminals.values()].map(t => ({name: t.name, host: t.host, port: t.port}));
-conn.connect().catch(e => console.warn(`Failed to reconnect "${name}":`, e));
-
-// ✅ Also accepted — compact (older code)
-const ids = items.map(v=>v.id);
-const active = users.filter(u=>u.status==='active');
+constructor(
+  private readonly coinService: CoinService,
+  private readonly lgr: TpsLogger
+) {
+  this.lgr.setContext('c6k.spend');
+}
 ```
 
-## Objects and Arrays
+## Method Chaining
 
-### Object Literals
-Space after colon in object literals is **fine** — recent code prefers it; compact form also accepted:
+Chain methods on a **single line** when reasonable, or on **minimal lines**:
 ```typescript
-// ✅ Correct — spaced (preferred in recent code)
-return {name: t.name, host: t.host, port: t.port, connected: t.connected};
+// ✅ Correct - short chain on one line
+const query = dbqb<Product>().fields(['id','name']).sort(['-created']).limit(10);
 
-// ✅ Also accepted — compact
-const config = {host:'localhost', port:3000, timeout:5000};
+// ✅ Correct - longer chain with minimal lines
+const query = dbqb<Product>()
+  .equal('status', 'active')
+  .equal('type', ProductType.RETAIL)
+  .fields(['id','name','price']).limit(100).sort('-created');
 ```
 
-### Inline Short Objects
-**Keep** short objects on single line:
+## Strings
+
+Use backticks for interpolation, single quotes otherwise:
+```typescript
+console.log(`Processing item ${id} with status ${status}`);
+const url = `${baseUrl}/api/${endpoint}`;
+```
+
+## Objects
+
+**Keep** short objects on a single line:
 ```typescript
 // ✅ Correct
 const point = {x: 10, y: 20};
-const user = {id: '123', name: 'John', active: true};
 
 // ❌ Wrong - unnecessary line breaks for short objects
 const point = {
@@ -271,54 +111,23 @@ const point = {
 };
 ```
 
-## Optional Chaining and Nullish Coalescing
+## Ternary Operators
 
-### Heavy Use of Optional Chaining
-**Prefer** optional chaining with nullish coalescing:
+**Keep** ternary operators on a single line:
 ```typescript
 // ✅ Correct
-const price = product?.price??0;
-const value = item.data?.value??defaultValue;
-const result = response?.data?.items?.[0]?.id??null;
+const price = hasDiscount ? discountPrice : regularPrice;
+const result = status==='active' ? process() : skip();
 
-// ✅ Correct - complex chaining
-const cost = lineItem?.price / (lineItem?.amount??1);
-```
-
-## Error Handling
-
-### Inline Error Returns
-**Use** single-line returns/throws without braces:
-```typescript
-// ✅ Correct
-if(!id) return null;
-if(!data) throw new Error('missing data');
-if(!user) return 'user not found';
-if(value<0) return {error:'invalid value'};
-
-// ❌ Wrong
-if (!id) {
-  return null;
-}
-```
-
-### Early Returns
-**Favor** early returns without braces:
-```typescript
-// ✅ Correct
-function process(input:string|null):Result {
-  if(!input) return null;
-  if(input.length===0) return emptyResult;
-  if(!isValid(input)) throw new Error('invalid input');
-
-  return compute(input);
-}
+// ❌ Wrong - avoid breaking ternaries
+const value = condition
+  ? trueValue
+  : falseValue;
 ```
 
 ## Comments
 
-### Documentation Comments
-**Use** JSDoc-style comments for functions and classes:
+Doc block form for functions and classes:
 ```typescript
 /**
  * Calculates cashback for a transaction
@@ -329,66 +138,29 @@ function process(input:string|null):Result {
 async calcCashback(trans:Transaction|string, vcard?:IVcard|null) {
 ```
 
-### Inline Comments
-**Use** single-line comments for field descriptions:
+Field and constant descriptions go on the same line or in a one-line doc block:
 ```typescript
-// ✅ Correct
 static MAX_RETRIES = 3; // maximum retry attempts
-const timeout = 5000; // milliseconds
 /** Returns user by ID */
 static getUserById = (id:string)=>users.get(id);
 ```
 
-### Mixed Language Comments
-**Allow** comments in native language (Ukrainian/Russian) when appropriate:
+## Static Members
+
+**Declare** static properties directly in the class body:
 ```typescript
-// ✅ Acceptable
-// обробка транзакції з кешбеком
-const cashback = await calculateCashback(transaction);
-
-/**
- * Sends notification to queue
- * відправляє нотифікацію в чергу обробки
- */
-```
-
-## Ternary Operators
-
-### Inline Ternary
-**Keep** ternary operators on single line:
-```typescript
-// ✅ Correct
-const value = condition ? trueValue : falseValue;
-const price = hasDiscount ? discountPrice : regularPrice;
-const result = status==='active' ? process() : skip();
-
-// ❌ Wrong - avoid breaking ternaries
-const value = condition
-  ? trueValue
-  : falseValue;
-```
-
-## Static Properties
-
-### Class Static Members
-**Declare** static properties directly in class body:
-```typescript
-// ✅ Correct
 export class CoreEvents {
   static S_NOTIFICATIONS = 'NOTIF';
-  static S_CONFIRMATIONS = 'CONF';
   static Q_NOTIFICATION_SEND = CoreEvents.S_NOTIFICATIONS+'.send';
 
   static URL_FROM_QNAME = (qname:string)=>qname.replace(/^[A-Z.]+/, '');
 }
 ```
 
-## Imports and Exports
+## Imports
 
-### Multi-Line Imports
-**Group** related imports with minimal spacing:
+Long import lists go one name per line; short ones stay on one line:
 ```typescript
-// ✅ Correct
 import {
   IProduct,
   Product,
@@ -401,44 +173,10 @@ import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 
 ## Debugging
 
-### Console Statements
-**Allow** console.log statements for debugging:
+`console.log` / `console.warn` / `console.error` are allowed for debugging:
 ```typescript
-// ✅ Acceptable in development
 console.log('processing transaction:', trans.id);
-console.warn('invalid state:', state);
-console.error('failed to process:', error);
 ```
-
-## Section Banner Comments
-
-Group related methods in services and controllers with banner comments:
-```typescript
-//////////////////////////////////////////////////////////
-// CONNECT METHODS
-
-async connect(host:string, port:number, force = false, name = 'default') { }
-async ping(name?:string, ip?:string) { }
-
-
-//////////////////////////////////////////////////////////
-// MONEY METHODS
-```
-
-## Multi-Statement One-Liner Guards
-
-When a guard needs a log + return, keep both statements braced on ONE line:
-```typescript
-// ✅ Correct
-if(!request.amount) {this.lgr.warn(`requestCoin: no amount for ${request.place}.`); return 'no amount';}
-if(!request.vcard ) {this.lgr.warn('requestCoin: no vcard in request' ); return 'no vcard'; }
-```
-
-## Comment Markers
-
-- `//TODO` — no space after `//` (project convention)
-- `//!!fut` / `//!!future` / `//!!maybe` — markers for future improvements / open questions; keep intact
-- Step comments inside methods often omit the space: `//validate`, `//check balance`
 
 ## NestJS Controller Patterns
 
@@ -455,21 +193,9 @@ async connect(
 }
 ```
 
-## General Principles
-
-1. **Horizontal over Vertical**: Prioritize compact horizontal code over vertical expansion
-2. **Minimal Spacing**: Reduce unnecessary whitespace around operators and keywords
-3. **Inline Simple Logic**: Keep simple operations on single lines
-4. **Type Inference**: Let TypeScript infer obvious types
-5. **Early Returns**: Use guard clauses without braces
-6. **Optional Chaining**: Leverage `?.` and `??` operators heavily
-7. **Single Quotes**: Consistently use single quotes for strings
-8. **Compact Formatting**: Favor readability through compactness
-
-## Examples Summary
+## Complete Example
 
 ```typescript
-// Complete example demonstrating style
 export class PaymentService {
   static DEFAULT_TIMEOUT = 5000;
 
@@ -478,23 +204,22 @@ export class PaymentService {
     private readonly logger: Logger
   ) {}
 
+  //////////////////////////////////////////////////////////
+  // PAYMENT METHODS
+
   async processPayment(orderId:string, amount:number):Promise<PaymentResult|null> {
     if(!orderId) return null;
     if(amount<=0) throw new Error('invalid amount');
 
     const order = await this.db.getOrder(orderId); if(!order) return null;
     const total = order.items?.reduce((sum,item)=>sum+(item.price??0)*(item.qty??1), 0)??0;
+    if(total!==amount) {this.logger.warn(`Amount mismatch: expected ${total}, got ${amount}`); return null;}
 
-    if(total!==amount) {
-      this.logger.warn(`Amount mismatch: expected ${total}, got ${amount}`);
-      return null;
-    }
-
-    const payment = await this.createPayment({orderId: orderId, amount: amount, status: 'pending'});
+    const payment = await this.createPayment({orderId, amount, status: 'pending'});
     const result = await this.gateway.charge(payment.id, amount);
 
-    if(result.success) return {payment: payment, status: 'completed', transactionId: result.id};
-    else return {payment: payment, status: 'failed', error: result.error};
+    if(result.success) return {payment, status: 'completed', transactionId: result.id};
+    else return {payment, status: 'failed', error: result.error};
   }
 }
 ```
